@@ -17,6 +17,7 @@ app.use(
       "http://localhost:5173",
       "http://192.168.13.9:5173",
       "http://172.33.144.1:5173",
+      "https://chatappbypellumi.netlify.app"
     ],
     methods: ["GET", "POST"],
     credentials: true,
