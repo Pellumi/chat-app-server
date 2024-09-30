@@ -55,4 +55,26 @@ messageRouter.get("/get-message/:conversation_id", async (req, res) => {
   } catch (err) {}
 });
 
+messageRouter.get("/get-latest-message/:conversation_id", async (req, res) => {
+  const { conversation_id } = req.params;
+
+  if (!conversation_id) {
+    return res.status(400).json({ message: "Conversation ID is required" });
+  }
+
+  try {
+    const [messages] = await connection
+      .promise()
+      .query(
+        "SELECT * FROM ConversationMessages WHERE conversation_id = ? ORDER BY timestamp DESC LIMIT 50",
+        [conversation_id]
+      );
+
+    res.status(200).json(messages.reverse()); // Reversing to get the messages in ascending order
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 module.exports = messageRouter;
