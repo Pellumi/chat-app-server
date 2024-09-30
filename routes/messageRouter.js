@@ -63,18 +63,36 @@ messageRouter.get("/get-latest-message/:user_id", async (req, res) => {
   }
 
   try {
-    const [messages] = await connection
-      .promise()
-      .query(
-        "SELECT * FROM ConversationMessages WHERE sender_id = ? OR receiver_id = ? ORDER BY timestamp DESC LIMIT 1000",
-        [user_id, user_id]
-      );
+    const [messages] = await connection.promise().query(
+      `SELECT 
+        Cm.id, 
+        Cm.conversation_id, 
+        Cm.sender_id, 
+        Cm.receiver_id, 
+        Cm.message_text, 
+        Cm.timestamp, 
+        U.first_name, 
+        U.last_name, 
+        U.username 
+      FROM 
+          ConversationMessages Cm 
+      JOIN 
+        users U 
+      ON ( 
+          (Cm.sender_id = U.id AND Cm.sender_id != ?) 
+          OR 
+          (Cm.receiver_id != ? AND Cm.receiver_id = U.id)
+        ) 
+      WHERE 
+      sender_id = ? OR receiver_id = ?
+      ORDER BY timestamp DESC LIMIT 1000;`,
+      [user_id, user_id, user_id, user_id]
+    );
 
     res.status(200).json(messages.reverse()); // Reversing to get the messages in ascending order
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 module.exports = messageRouter;
