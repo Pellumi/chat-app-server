@@ -59,7 +59,7 @@ messageRouter.get("/get-latest-message/:user_id", async (req, res) => {
   const { user_id } = req.params;
 
   if (!user_id) {
-    return res.status(400).json({ message: "Conversation ID is required" });
+    return res.status(400).json({ message: "User ID is required" });
   }
 
   try {
@@ -77,7 +77,7 @@ messageRouter.get("/get-latest-message/:user_id", async (req, res) => {
       FROM 
           ConversationMessages Cm 
       JOIN 
-        users U 
+        Users U 
       ON ( 
           (Cm.sender_id = U.id AND Cm.sender_id != ?) 
           OR 
@@ -91,7 +91,7 @@ messageRouter.get("/get-latest-message/:user_id", async (req, res) => {
 
     res.status(200).json(messages.reverse()); // Reversing to get the messages in ascending order
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: err });
   }
 });
 
